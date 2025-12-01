@@ -1,0 +1,11 @@
+id,title,artist,mood_tag,energy,language,url
+1,Happy,Pharrell Williams,happy,0.9,English,https://www.youtube.com/watch?v=ZbZSe6N_BXs
+2,Don't Worry Be Happy,Bobby McFerrin,happy,0.6,English,https://www.youtube.com/watch?v=d-diB65scQU
+3,Someone Like You,Adele,sad,0.3,English,https://www.youtube.com/watch?v=hLQl3WQQoQ0
+4,Fix You,Coldplay,sad,0.4,English,https://www.youtube.com/watch?v=k4V3Mo61fJM
+5,Eye of the Tiger,Survivor,angry,0.9,English,https://www.youtube.com/watch?v=btPJPFnesV4
+6,Break Stuff,Limp Bizkit,angry,0.95,English,https://www.youtube.com/watch?v=ZpUYjpKg9KY
+7,Three Little Birds,Bob Marley,neutral,0.5,English,https://www.youtube.com/watch?v=LanCLS_hIo4
+8,Weightless,Marconi Union,neutral,0.2,Instrumental,https://www.youtube.com/watch?v=UfcAVejslrU
+9,Thriller,Michael Jackson,fear,0.8,English,https://www.youtube.com/watch?v=sOnqjkJTMaA
+10,Uptown Funk,Mark Ronson ft. Bruno Mars,happy,0.95,English,https://www.youtube.com/watch?v=OPf0YbXqDm0

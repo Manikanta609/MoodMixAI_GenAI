@@ -1,0 +1,57 @@
+/* Main Background */
+.stApp {
+    background: linear-gradient(to right, #141e30, #243b55);
+    color: #ffffff;
+}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Cards/Containers */
+div[data-testid="stVerticalBlock"] > div {
+    /* This is a bit generic, targeting containers might need specific classes if Streamlit allows, 
+       but for now we rely on standard elements */
+}
+
+/* Custom Card Class (we will wrap content in markdown divs) */
+.css-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #00d2ff !important;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+}
+
+/* Buttons */
+.stButton > button {
+    background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 25px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
+}
+
+/* Metrics */
+[data-testid="stMetricValue"] {
+    color: #00d2ff;
+}
