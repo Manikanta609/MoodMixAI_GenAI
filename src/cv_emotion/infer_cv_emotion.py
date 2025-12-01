@@ -1,10 +1,5 @@
-import cv2
-import numpy as np
-import torch
-from transformers import pipeline
-from PIL import Image
-import mediapipe as mp
 import os
+from PIL import Image
 
 class CVEmotionInference:
     def __init__(self, model_path=None):
@@ -12,32 +7,42 @@ class CVEmotionInference:
         Initializes the CV emotion inference.
         Uses MediaPipe for face detection and a Hugging Face Transformer for emotion recognition.
         """
-        self.device = 0 if torch.cuda.is_available() else -1
-        # print(f"Loading CV Emotion model on device: {self.device}...")
-        
-        # Load Face Detector (MediaPipe)
-        self.mp_face_detection = mp.solutions.face_detection
-        self.face_detection = self.mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5)
-        
-        # Load Emotion Classifier (Hugging Face)
-        # Using a robust ViT model fine-tuned for facial emotions
-        # Construct absolute path to the flat model directory
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.dirname(os.path.dirname(current_dir))
-        model_path = os.path.join(project_root, "models", "cv_model_flat")
-        
-        # print(f"Loading CV Model from: {model_path}")
-
-        self.classifier = pipeline(
-            "image-classification", 
-            model=model_path, 
-            device=self.device,
-            model_kwargs={"local_files_only": True}
-        )
-        
-        # Mapping from model labels to our standard 7 emotions
-        # Model labels: ['sad', 'disgust', 'angry', 'neutral', 'fear', 'surprise', 'happy']
-        self.target_emotions = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
+        try:
+            import cv2
+            import numpy as np
+            import torch
+            from transformers import pipeline
+            import mediapipe as mp
+            
+            self.cv2 = cv2
+            self.np = np
+            self.torch = torch
+            
+            self.device = 0 if torch.cuda.is_available() else -1
+            
+            # Load Face Detector (MediaPipe)
+            self.mp_face_detection = mp.solutions.face_detection
+            self.face_detection = self.mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5)
+            
+            # Load Emotion Classifier (Hugging Face)
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(current_dir))
+            model_path = os.path.join(project_root, "models", "cv_model_flat")
+            
+            self.classifier = pipeline(
+                "image-classification", 
+                model=model_path, 
+                device=self.device,
+                model_kwargs={"local_files_only": True}
+            )
+            
+            self.target_emotions = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
+            self.initialized = True
+            
+        except Exception as e:
+            print(f"CRITICAL ERROR initializing CVEmotionInference: {e}")
+            self.initialized = False
+            self.error = str(e)
 
     def predict(self, image):
         """
@@ -48,11 +53,15 @@ class CVEmotionInference:
             probs (dict): Dictionary of emotion probabilities.
             face_roi (numpy.ndarray): The cropped face image.
         """
+        if not getattr(self, 'initialized', False):
+            print(f"CV Inference not initialized: {getattr(self, 'error', 'Unknown error')}")
+            return None, None
+            
         if image is None:
             return None, None
 
         # 1. Face Detection with MediaPipe
-        results = self.face_detection.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        results = self.face_detection.process(self.cv2.cvtColor(image, self.cv2.COLOR_BGR2RGB))
         
         if not results.detections:
             return None, None
@@ -77,7 +86,7 @@ class CVEmotionInference:
 
         # 2. Emotion Recognition with Transformer
         # Convert to PIL Image (RGB)
-        pil_image = Image.fromarray(cv2.cvtColor(face_roi, cv2.COLOR_BGR2RGB))
+        pil_image = Image.fromarray(self.cv2.cvtColor(face_roi, self.cv2.COLOR_BGR2RGB))
         
         try:
             results = self.classifier(pil_image)
