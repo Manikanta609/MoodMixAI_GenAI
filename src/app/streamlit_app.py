@@ -4,13 +4,30 @@ import sys
 # Disable progress bars GLOBALLY (Must be before other imports)
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 
-# Patch tqdm to be silent
+# Patch tqdm to be silent (must be a class to allow inheritance)
 try:
     from tqdm import tqdm
+    
+    class SilentTQDM:
+        def __init__(self, iterable=None, *args, **kwargs):
+            self.iterable = iterable
+        def __iter__(self):
+            return iter(self.iterable) if self.iterable else iter([])
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def update(self, *args, **kwargs):
+            pass
+        @classmethod
+        def write(cls, *args, **kwargs):
+            pass
+            
     tqdm.pandas = lambda *args, **kwargs: None
-    def nop(*args, **kwargs): return args[0] if args else None
     import tqdm.auto as tqdm_auto
-    tqdm_auto.tqdm = lambda *args, **kwargs: iter(args[0]) if args and hasattr(args[0], '__iter__') else None
+    tqdm_auto.tqdm = SilentTQDM
+    import tqdm.std as tqdm_std
+    tqdm_std.tqdm = SilentTQDM
 except ImportError:
     pass
 
