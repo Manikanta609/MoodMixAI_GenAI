@@ -29,6 +29,9 @@ try:
                 def __enter__(self): return self
                 def __exit__(self, *args): pass
             return DummyLock()
+        @classmethod
+        def set_lock(cls, lock):
+            pass
             
     tqdm.pandas = lambda *args, **kwargs: None
     import tqdm.auto as tqdm_auto
