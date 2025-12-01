@@ -22,6 +22,13 @@ try:
         @classmethod
         def write(cls, *args, **kwargs):
             pass
+        @classmethod
+        def get_lock(cls):
+            # Return a dummy context manager or lock
+            class DummyLock:
+                def __enter__(self): return self
+                def __exit__(self, *args): pass
+            return DummyLock()
             
     tqdm.pandas = lambda *args, **kwargs: None
     import tqdm.auto as tqdm_auto
