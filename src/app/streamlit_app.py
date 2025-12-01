@@ -29,6 +29,24 @@ sys.path.append(PROJECT_ROOT)
 cache_dir = os.path.join(PROJECT_ROOT, "model_cache")
 os.environ["HF_HOME"] = cache_dir
 
+# Auto-download models if missing (for Streamlit Cloud)
+from huggingface_hub import snapshot_download
+
+def check_and_download_models():
+    models_dir = os.path.join(PROJECT_ROOT, "models")
+    cv_model_path = os.path.join(models_dir, "cv_model_flat")
+    nlp_model_path = os.path.join(models_dir, "nlp_model_flat")
+    
+    if not os.path.exists(cv_model_path) or not os.listdir(cv_model_path):
+        with st.spinner("Downloading CV Model (this may take a minute)..."):
+            snapshot_download(repo_id="dima806/facial_emotions_image_detection", local_dir=cv_model_path, local_dir_use_symlinks=False)
+            
+    if not os.path.exists(nlp_model_path) or not os.listdir(nlp_model_path):
+        with st.spinner("Downloading NLP Model (this may take a minute)..."):
+            snapshot_download(repo_id="bhadresh-savani/distilbert-base-uncased-emotion", local_dir=nlp_model_path, local_dir_use_symlinks=False)
+
+check_and_download_models()
+
 from src.cv_emotion.infer_cv_emotion import CVEmotionInference
 from src.nlp_emotion.infer_nlp_emotion import NLPEmotionInference
 from src.fusion.fuse_mood import fuse_mood
