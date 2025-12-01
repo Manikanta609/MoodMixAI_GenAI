@@ -5,44 +5,27 @@ import sys
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 
 # Patch tqdm to be silent (must be a class to allow inheritance)
+# Patch tqdm to be silent (must be a class to allow inheritance)
 try:
-    from tqdm import tqdm
+    from tqdm import tqdm as _tqdm
     
-    class SilentTQDM:
-        def __init__(self, iterable=None, *args, **kwargs):
-            self.iterable = iterable
-            self._lock = self.get_lock()
-            self.n = 0
-            self.total = 0
-        def __iter__(self):
-            return iter(self.iterable) if self.iterable else iter([])
-        def __enter__(self):
-            return self
-        def __exit__(self, *args):
-            pass
-        def update(self, *args, **kwargs):
-            pass
-        @classmethod
-        def write(cls, *args, **kwargs):
-            pass
-        @classmethod
-        def get_lock(cls):
-            class DummyLock:
-                def __enter__(self): return self
-                def __exit__(self, *args): pass
-            return DummyLock()
-        @classmethod
-        def set_lock(cls, lock):
-            pass
-        def __getattr__(self, name):
-            # Return a dummy function for any other method called
-            return lambda *args, **kwargs: None
+    class SilentTQDM(_tqdm):
+        def __init__(self, *args, **kwargs):
+            # Force disable=True to silence output
+            kwargs['disable'] = True
+            super().__init__(*args, **kwargs)
             
-    tqdm.pandas = lambda *args, **kwargs: None
+    # Patch the main tqdm class and auto/std modules
+    import tqdm
+    tqdm.tqdm = SilentTQDM
     import tqdm.auto as tqdm_auto
     tqdm_auto.tqdm = SilentTQDM
     import tqdm.std as tqdm_std
     tqdm_std.tqdm = SilentTQDM
+    
+    # Disable pandas progress_apply
+    tqdm.pandas = lambda *args, **kwargs: None
+    
 except ImportError:
     pass
 
