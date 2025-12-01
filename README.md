@@ -1,19 +1,3 @@
-# MoodMix AI - Multimodal Emotion-Aware Music Recommender
-
-MoodMix AI is a project that recommends music based on your current mood, detected from both your facial expression (via webcam) and your text input (mood diary).
-
-## Setup
-
-1.  **Create a Virtual Environment**:
-    ```bash
-    python -m venv .venv
-    # Windows
-    .venv\Scripts\activate
-    # Linux/Mac
-    source .venv/bin/activate
-    ```
-
-2.  **Install Dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
