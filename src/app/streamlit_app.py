@@ -222,11 +222,18 @@ if cv_probs or nlp_probs:
                 for i, song in enumerate(songs):
                     with st.expander(f"{i+1}. {song['title']} - {song['artist']}", expanded=True):
                         st.write(f"**Mood:** {song['mood_tag'].title()}")
-                        if "youtube.com" in song['url'] or "youtu.be" in song['url']:
-                            st.video(song['url'])
-                            st.markdown(f"[Watch on YouTube]({song['url']})", unsafe_allow_html=True)
+                        
+                        url = song['url']
+                        if "youtu.be" in url or "youtube.com" in url:
+                            # Normalize URL to ensure standard format
+                            if "youtu.be" in url:
+                                video_id = url.split("/")[-1].split("?")[0]
+                                url = f"https://www.youtube.com/watch?v={video_id}"
+                                
+                            st.video(url)
+                            st.markdown(f"[Watch on YouTube]({url})", unsafe_allow_html=True)
                         else:
-                            st.markdown(f"[Listen on External Player]({song['url']})")
+                            st.markdown(f"[Listen on External Player]({url})")
             else:
                 st.info("No songs found for this mood.")
         st.markdown('</div>', unsafe_allow_html=True)
