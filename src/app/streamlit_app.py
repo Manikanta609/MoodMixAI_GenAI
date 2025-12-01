@@ -224,6 +224,7 @@ if cv_probs or nlp_probs:
                         st.write(f"**Mood:** {song['mood_tag'].title()}")
                         if "youtube.com" in song['url'] or "youtu.be" in song['url']:
                             st.video(song['url'])
+                            st.markdown(f"[Watch on YouTube]({song['url']})", unsafe_allow_html=True)
                         else:
                             st.markdown(f"[Listen on External Player]({song['url']})")
             else:

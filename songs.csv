@@ -1,11 +1,35 @@
-id,title,artist,mood_tag,energy,language,url
-1,Happy,Pharrell Williams,happy,0.9,English,https://www.youtube.com/watch?v=ZbZSe6N_BXs
-2,Don't Worry Be Happy,Bobby McFerrin,happy,0.6,English,https://www.youtube.com/watch?v=d-diB65scQU
-3,Someone Like You,Adele,sad,0.3,English,https://www.youtube.com/watch?v=hLQl3WQQoQ0
-4,Fix You,Coldplay,sad,0.4,English,https://www.youtube.com/watch?v=k4V3Mo61fJM
-5,Eye of the Tiger,Survivor,angry,0.9,English,https://www.youtube.com/watch?v=btPJPFnesV4
-6,Break Stuff,Limp Bizkit,angry,0.95,English,https://www.youtube.com/watch?v=ZpUYjpKg9KY
-7,Three Little Birds,Bob Marley,neutral,0.5,English,https://www.youtube.com/watch?v=LanCLS_hIo4
-8,Weightless,Marconi Union,neutral,0.2,Instrumental,https://www.youtube.com/watch?v=UfcAVejslrU
-9,Thriller,Michael Jackson,fear,0.8,English,https://www.youtube.com/watch?v=sOnqjkJTMaA
-10,Uptown Funk,Mark Ronson ft. Bruno Mars,happy,0.95,English,https://www.youtube.com/watch?v=OPf0YbXqDm0
+id,title,artist,mood_tag,language,url
+1,Belageddu,Vijay Prakash,happy,Kannada,https://youtu.be/0ZzCY6_6Rhs
+2,Yenammi Yenammi,Sanjith Hegde,happy,Kannada,https://youtu.be/Fg81B7l2H8c
+3,Ondu Malebillu,Armaan Malik,happy,Kannada,https://youtu.be/iZ1H9rxnEJ4
+4,Kanase Taraha,Nakash Aziz,happy,Kannada,https://youtu.be/Ue4uZlu0W6w
+5,Marali Manasaagide,Nakul Abhyankar,happy,Kannada,https://youtu.be/i5JQbDqKx7Q
+6,Yaare Nee Mohini,Sonu Nigam,sad,Kannada,https://youtu.be/g0EYh3L6y_c
+7,Marali Mareyalaagide,Ananya Bhat,sad,Kannada,https://youtu.be/KQ9Hw3rro7M
+8,Ninna Nodalenthu,Ravi Basrur,sad,Kannada,https://youtu.be/NQlFYQmdc1Y
+9,Beku Beku,Karthik,sad,Kannada,https://youtu.be/15j1Eqk8M20
+10,Bidona,Sonu Nigam,sad,Kannada,https://youtu.be/DlXH1wU5aT4
+11,Tagaru,Shivappa,angry,Kannada,https://youtu.be/ojGJpUXnJ14
+12,Dumdum Dumdaad,Santosh Venky,angry,Kannada,https://youtu.be/8P2Tq2SwP0Q
+13,Bombe Helutaite,Vasuki Vaibhav,neutral,Kannada,https://youtu.be/8CaqCZ2PzP4
+14,Jothe Jotheyali,Sonu Nigam,neutral,Kannada,https://youtu.be/-SbX6ezum4A
+15,Usire Usire,Sonu Nigam,fear,Kannada,https://youtu.be/YwYg3USn3zs
+16,Kannu Hedisale,Kunal Ganjawala,disgust,Kannada,https://youtu.be/EnTOJj0E7Eo
+17,Googly,Shreya Ghoshal,surprise,Kannada,https://youtu.be/8yJ8k0JQF78
+18,Samajavaragamana,Sid Sriram,happy,Telugu,https://youtu.be/Quv4s2jRyis
+19,Butta Bomma,Armaan Malik,happy,Telugu,https://youtu.be/2i0vFhM7rq4
+20,Inkem Inkem,Sid Sriram,happy,Telugu,https://youtu.be/sJqgogE7X7U
+21,Evo Evo Kalale,Javed Ali,happy,Telugu,https://youtu.be/qAtNoqvbFGw
+22,Hey Pillaga,Various,happy,Telugu,https://youtu.be/lIQIPS2xwFM
+23,Maate Vinadhuga,Armaan Malik,sad,Telugu,https://youtu.be/9mU5mFdfq7g
+24,Nuvvunte Naa Jathaga,Anurag Kulkarni,sad,Telugu,https://youtu.be/3FJdSRdvFaY
+25,Yenti Yenti,Chinmayi,sad,Telugu,https://youtu.be/SYyE7Zzjq4k
+26,Nee Neeli Kannullona,Sid Sriram,sad,Telugu,https://youtu.be/Q3bKXJelKZg
+27,Oohale,Sid Sriram,sad,Telugu,https://youtu.be/TbR-dyhSeX8
+28,Powerstar Anthem,Various,angry,Telugu,https://youtu.be/HpKW6D1HxBM
+29,Pareshanura,Jakes Bejoy,angry,Telugu,https://youtu.be/O4lDXD0NLBY
+30,Mr Perfect,DSP,neutral,Telugu,https://youtu.be/ZExxYDMRz7Q
+31,Choosa Choosa,Bhargavi,neutral,Telugu,https://youtu.be/pCb4o2_bW_g
+32,Evaru Theme,Sricharan Pakala,fear,Telugu,https://youtu.be/8D9n32CuWH4
+33,Breakup Song,Various,disgust,Telugu,https://youtu.be/o-5ZnsDK2Yc
+34,Ramuloo Ramulaa,Anurag Kulkarni,surprise,Telugu,https://youtu.be/1gk0vLw5z8I
