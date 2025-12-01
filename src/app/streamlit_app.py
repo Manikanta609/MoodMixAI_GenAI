@@ -24,7 +24,6 @@ try:
             pass
         @classmethod
         def get_lock(cls):
-            # Return a dummy context manager or lock
             class DummyLock:
                 def __enter__(self): return self
                 def __exit__(self, *args): pass
@@ -32,6 +31,9 @@ try:
         @classmethod
         def set_lock(cls, lock):
             pass
+        def __getattr__(self, name):
+            # Return a dummy function for any other method called
+            return lambda *args, **kwargs: None
             
     tqdm.pandas = lambda *args, **kwargs: None
     import tqdm.auto as tqdm_auto
@@ -40,6 +42,13 @@ try:
     tqdm_std.tqdm = SilentTQDM
 except ImportError:
     pass
+
+# Global Exception Handler
+import streamlit as st
+def global_exception_handler(exctype, value, traceback):
+    st.error(f"Uncaught exception: {value}")
+    sys.__excepthook__(exctype, value, traceback)
+sys.excepthook = global_exception_handler
 
 import streamlit as st
 import cv2
