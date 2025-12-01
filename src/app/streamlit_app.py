@@ -1,25 +1,30 @@
-import streamlit as st
-import cv2
-import numpy as np
-import pandas as pd
-from PIL import Image
-import sys
 import os
-import plotly.graph_objects as go
-from transformers import utils
-import logging
+import sys
 
-# Disable progress bars and logging to avoid "Handle is invalid" on Windows
-utils.logging.set_verbosity_error()
+# Disable progress bars GLOBALLY (Must be before other imports)
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+
+# Patch tqdm to be silent
 try:
     from tqdm import tqdm
     tqdm.pandas = lambda *args, **kwargs: None
-    # Patch tqdm to be silent
     def nop(*args, **kwargs): return args[0] if args else None
     import tqdm.auto as tqdm_auto
     tqdm_auto.tqdm = lambda *args, **kwargs: iter(args[0]) if args and hasattr(args[0], '__iter__') else None
 except ImportError:
     pass
+
+import streamlit as st
+import cv2
+import numpy as np
+import pandas as pd
+from PIL import Image
+import plotly.graph_objects as go
+from transformers import utils
+import logging
+
+# Disable transformers logging
+utils.logging.set_verbosity_error()
 
 # Add project root to path so we can import src modules
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -37,13 +42,18 @@ def check_and_download_models():
     cv_model_path = os.path.join(models_dir, "cv_model_flat")
     nlp_model_path = os.path.join(models_dir, "nlp_model_flat")
     
-    if not os.path.exists(cv_model_path) or not os.listdir(cv_model_path):
-        with st.spinner("Downloading CV Model (this may take a minute)..."):
-            snapshot_download(repo_id="dima806/facial_emotions_image_detection", local_dir=cv_model_path, local_dir_use_symlinks=False)
-            
-    if not os.path.exists(nlp_model_path) or not os.listdir(nlp_model_path):
-        with st.spinner("Downloading NLP Model (this may take a minute)..."):
-            snapshot_download(repo_id="bhadresh-savani/distilbert-base-uncased-emotion", local_dir=nlp_model_path, local_dir_use_symlinks=False)
+    try:
+        if not os.path.exists(cv_model_path) or not os.listdir(cv_model_path):
+            with st.spinner("Downloading CV Model (this may take a minute)..."):
+                snapshot_download(repo_id="dima806/facial_emotions_image_detection", local_dir=cv_model_path, local_dir_use_symlinks=False)
+                
+        if not os.path.exists(nlp_model_path) or not os.listdir(nlp_model_path):
+            with st.spinner("Downloading NLP Model (this may take a minute)..."):
+                snapshot_download(repo_id="bhadresh-savani/distilbert-base-uncased-emotion", local_dir=nlp_model_path, local_dir_use_symlinks=False)
+    except Exception as e:
+        st.error(f"Failed to download models: {e}")
+        # Don't stop, let it try to load and fail gracefully later if needed
+        pass
 
 check_and_download_models()
 
