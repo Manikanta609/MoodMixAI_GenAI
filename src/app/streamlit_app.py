@@ -5,37 +5,6 @@ import sys
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 
 # Patch tqdm to be silent (must be a class to allow inheritance)
-# Patch tqdm to be silent (must be a class to allow inheritance)
-try:
-    from tqdm import tqdm as _tqdm
-    
-    class SilentTQDM(_tqdm):
-        def __init__(self, *args, **kwargs):
-            # Force disable=True to silence output
-            kwargs['disable'] = True
-            super().__init__(*args, **kwargs)
-            
-    # Patch the main tqdm class and auto/std modules
-    import tqdm
-    tqdm.tqdm = SilentTQDM
-    import tqdm.auto as tqdm_auto
-    tqdm_auto.tqdm = SilentTQDM
-    import tqdm.std as tqdm_std
-    tqdm_std.tqdm = SilentTQDM
-    
-    # Disable pandas progress_apply
-    tqdm.pandas = lambda *args, **kwargs: None
-    
-except ImportError:
-    pass
-
-# Global Exception Handler
-import streamlit as st
-def global_exception_handler(exctype, value, traceback):
-    st.error(f"Uncaught exception: {value}")
-    sys.__excepthook__(exctype, value, traceback)
-sys.excepthook = global_exception_handler
-
 import streamlit as st
 import cv2
 import numpy as np
@@ -44,6 +13,9 @@ from PIL import Image
 import plotly.graph_objects as go
 from transformers import utils
 import logging
+
+# Page Config (Must be the first Streamlit command)
+st.set_page_config(page_title="MoodMix AI", page_icon="🎵", layout="wide")
 
 # Disable transformers logging
 utils.logging.set_verbosity_error()
@@ -55,6 +27,12 @@ sys.path.append(PROJECT_ROOT)
 # Set local cache directory for models
 cache_dir = os.path.join(PROJECT_ROOT, "model_cache")
 os.environ["HF_HOME"] = cache_dir
+
+# Global Exception Handler
+def global_exception_handler(exctype, value, traceback):
+    st.error(f"Uncaught exception: {value}")
+    sys.__excepthook__(exctype, value, traceback)
+sys.excepthook = global_exception_handler
 
 # Auto-download models if missing (for Streamlit Cloud)
 from huggingface_hub import snapshot_download
@@ -83,9 +61,6 @@ from src.cv_emotion.infer_cv_emotion import CVEmotionInference
 from src.nlp_emotion.infer_nlp_emotion import NLPEmotionInference
 from src.fusion.fuse_mood import fuse_mood
 from src.recommender.recommender import MusicRecommender
-
-# Page Config
-st.set_page_config(page_title="MoodMix AI", page_icon="🎵", layout="wide")
 
 # Load Custom CSS
 def load_css(file_name):
