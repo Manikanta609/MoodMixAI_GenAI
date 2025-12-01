@@ -11,6 +11,9 @@ try:
     class SilentTQDM:
         def __init__(self, iterable=None, *args, **kwargs):
             self.iterable = iterable
+            self._lock = self.get_lock()
+            self.n = 0
+            self.total = 0
         def __iter__(self):
             return iter(self.iterable) if self.iterable else iter([])
         def __enter__(self):
