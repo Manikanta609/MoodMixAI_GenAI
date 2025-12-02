@@ -24,11 +24,24 @@ class MusicRecommender:
             print(f"No songs found for mood: {mood_label}. Returning random selection.")
             return self.songs_df.sample(n=min(top_k, len(self.songs_df))).to_dict('records')
             
-        # Sample if we have more than top_k
-        if len(relevant_songs) > top_k:
-            recommended = relevant_songs.sample(n=top_k)
-        else:
-            recommended = relevant_songs
+        # Prioritize verified songs (verified=2 is highest, 1 is normal)
+        # We want to shuffle within the priority groups to keep it interesting
+        
+        # Split into priority groups
+        high_priority = relevant_songs[relevant_songs['verified'] >= 2]
+        normal_priority = relevant_songs[relevant_songs['verified'] < 2]
+        
+        # Shuffle each group
+        if not high_priority.empty:
+            high_priority = high_priority.sample(frac=1)
+        if not normal_priority.empty:
+            normal_priority = normal_priority.sample(frac=1)
+            
+        # Concatenate
+        sorted_songs = pd.concat([high_priority, normal_priority])
+        
+        # Take top k
+        recommended = sorted_songs.head(top_k)
             
         return recommended.to_dict('records')
 
