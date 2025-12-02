@@ -11,14 +11,11 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 import plotly.graph_objects as go
-from transformers import utils
-import logging
+# Disable transformers logging via env var (lighter than importing transformers)
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 
 # Page Config (Must be the first Streamlit command)
 st.set_page_config(page_title="MoodMix AI", page_icon="🎵", layout="wide")
-
-# Disable transformers logging
-utils.logging.set_verbosity_error()
 
 # Add project root to path so we can import src modules
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
