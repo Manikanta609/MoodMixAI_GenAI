@@ -218,9 +218,7 @@ if cv_probs or nlp_probs:
             if songs:
                 for i, song in enumerate(songs):
                     with st.expander(f"{i+1}. {song['title']} - {song['artist']}", expanded=True):
-                        # Verified Badge
-                        verified_badge = "✅ Play Ready" if song.get('verified', 0) >= 2 else ""
-                        st.write(f"**Mood:** {song['mood_tag'].title()} {verified_badge}")
+                        st.write(f"**Mood:** {song['mood_tag'].title()}")
                         
                         url = song['url']
                         if "youtu.be" in url or "youtube.com" in url:
