@@ -73,6 +73,29 @@ Fusion strategies are generally categorized into:
 \end{itemize}
 MoodMix AI employs late fusion, allowing the CV and NLP modules to operate asynchronously and independently, enhancing system reliability.
 
+\section{Mathematical Formulation}
+
+\subsection{Vision Transformer (ViT) Mechanism}
+The core of our CV module is the Vision Transformer. Unlike CNNs, ViT processes an image $x \in \mathbb{R}^{H \times W \times C}$ by reshaping it into a sequence of flattened 2D patches $x_p \in \mathbb{R}^{N \times (P^2 \cdot C)}$, where $(P, P)$ is the resolution of each patch and $N = HW/P^2$ is the number of patches.
+
+Each patch is linearly projected into a latent vector of dimension $D$. A learnable class token $x_{class}$ is prepended to the sequence. Position embeddings $E_{pos}$ are added to retain spatial information:
+\begin{equation}
+z_0 = [x_{class}; x_p^1 E; x_p^2 E; \dots; x_p^N E] + E_{pos}
+\end{equation}
+
+The Transformer encoder consists of alternating layers of Multi-Headed Self-Attention (MSA) and Multi-Layer Perceptron (MLP) blocks. The MSA mechanism is defined as:
+\begin{equation}
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+where $Q, K, V$ are the Query, Key, and Value matrices derived from the input embeddings. This allows the model to attend to different parts of the face simultaneously (e.g., focusing on the curvature of the lips and the crinkling of the eyes) to determine the emotion.
+
+\subsection{DistilBERT Architecture}
+DistilBERT is trained using knowledge distillation, where a smaller student model $S$ is trained to reproduce the behavior of a larger teacher model $T$ (BERT). The loss function combines the distillation loss $L_{ce}$ over the soft target probabilities of the teacher and the student:
+\begin{equation}
+L = \alpha L_{ce} + \beta L_{cos}
+\end{equation}
+where $L_{cos}$ is the cosine embedding loss. This ensures that the student model learns the same structural understanding of language as the teacher but with significantly fewer parameters (6 layers vs. 12 layers).
+
 \section{Methodology}
 
 The proposed system architecture is depicted in Fig. \ref{fig:architecture}. It comprises four distinct modules: Data Acquisition, Unimodal Processing, Fusion, and Recommendation.
@@ -128,19 +151,17 @@ The CV module is responsible for capturing and analyzing facial expressions.
 \subsubsection{Face Detection}
 We utilize Google's MediaPipe Face Detection, an ultra-lightweight solution that employs a BlazeFace model. It infers 6 degrees of freedom (DOF) pose and 128-dimensional facial embeddings. This step ensures that only the relevant region of interest (ROI)---the face---is passed to the emotion classifier, reducing background noise.
 
-\subsubsection{Vision Transformer (ViT)}
-The cropped face image ($224 \times 224 \times 3$) is divided into fixed-size patches (e.g., $16 \times 16$). Each patch is linearly embedded, position embeddings are added, and the resulting sequence of vectors is fed into a standard Transformer encoder. The model, pre-trained on ImageNet and fine-tuned on FER datasets, outputs a probability distribution over 7 classes:
+\subsubsection{Emotion Classification}
+The cropped image is passed to the ViT model. The model outputs a probability distribution over 7 classes:
 \[ C_{CV} = \{Angry, Disgust, Fear, Happy, Sad, Surprise, Neutral\} \]
-
-The self-attention mechanism in ViT allows the model to weigh the importance of different facial regions (e.g., eyes vs. mouth) dynamically, leading to higher accuracy in detecting subtle expressions.
 
 \subsection{Natural Language Processing Module}
 The NLP module processes user-generated text to extract sentiment.
 \subsubsection{Preprocessing}
 Input text is cleaned (lowercased, punctuation removed) and tokenized using the WordPiece tokenizer. Special tokens `[CLS]` and `[SEP]` are added to mark the start and end of the sentence.
 
-\subsubsection{DistilBERT Model}
-The tokenized sequence is processed by DistilBERT. The model consists of 6 Transformer layers (compared to BERT's 12), with 66 million parameters. It outputs a hidden state vector for the `[CLS]` token, which serves as the aggregate representation of the sentence. A classification head then maps this vector to 6 emotion classes:
+\subsubsection{Classification}
+The tokenized sequence is processed by DistilBERT. It outputs a probability distribution over 6 classes:
 \[ C_{NLP} = \{Joy, Sadness, Anger, Fear, Love, Surprise\} \]
 
 \subsubsection{Mapping Strategy}
@@ -173,6 +194,21 @@ The recommendation engine queries a structured dataset (`songs.csv`) containing:
     \item \textbf{Verified URL}: A validated YouTube link (Lyrical/Video).
 \end{itemize}
 The engine filters songs where $Tag_{song} == \text{argmax}(P_{Final})$. To prevent playlist fatigue, it employs a randomized sampling strategy if the candidate pool exceeds $k=5$ songs.
+
+\section{Dataset Details}
+\subsection{Training Datasets}
+The robustness of our models relies on high-quality training data.
+\begin{itemize}
+    \item \textbf{FER-2013 (CV)}: The ViT model was fine-tuned on the FER-2013 dataset, which consists of 35,887 grayscale images of faces ($48 \times 48$ pixels). The dataset is challenging due to variations in pose, occlusion, and illumination.
+    \item \textbf{Emotion Dataset (NLP)}: The DistilBERT model was trained on a dataset of English Twitter messages labeled with six basic emotions. This dataset captures informal language, slang, and emojis common in user text input.
+\end{itemize}
+
+\subsection{Music Dataset Curation}
+We curated a custom dataset of 35 songs across 3 languages (Kannada, Telugu, Hindi) and 7 mood categories. Each song was manually verified for:
+\begin{enumerate}
+    \item \textbf{Mood Alignment}: Ensuring the song's tempo, lyrics, and melody match the assigned tag.
+    \item \textbf{Playability}: Verifying that the YouTube link is embeddable and not region-locked.
+\end{enumerate}
 
 \section{System Implementation}
 
@@ -232,6 +268,14 @@ To demonstrate the value of fusion, consider the following scenario:
 \[ P_{Final}(Fear) = 0.6(0.0) + 0.4(0.7) = 0.28 \]
 In this specific weighted setup, the visual signal still dominates, but the confidence is significantly lowered. By adjusting weights or using a learned fusion layer (future work), the system can better handle such sarcasm or masking behavior.
 
+\subsection{Ablation Study}
+We conducted a theoretical ablation study to assess the contribution of each modality.
+\begin{itemize}
+    \item \textbf{CV Only}: High accuracy for strong emotions (Happy, Surprise) but fails on subtle states (Anxiety, Boredom) or when the face is occluded.
+    \item \textbf{NLP Only}: Excellent for explicit context ("I lost my job") but susceptible to sarcasm and requires manual user effort.
+    \item \textbf{Fusion}: Provides the highest robustness. If one modality fails (e.g., low lighting for CV), the other compensates.
+\end{itemize}
+
 \subsection{Comparison with Existing Methods}
 Table \ref{tab:comparison} compares MoodMix AI with standard approaches.
 
@@ -252,6 +296,14 @@ Privacy Preserving & Low & Medium & \textbf{High*} \\
 \label{tab:comparison}
 \end{center}
 \end{table}
+
+\section{Ethical Considerations}
+The deployment of emotion recognition systems raises important ethical questions.
+\begin{itemize}
+    \item \textbf{Privacy}: MoodMix AI is designed with privacy by default. Images are processed in volatile memory and are never stored or transmitted to external servers for training.
+    \item \textbf{Bias}: We acknowledge that FER models can exhibit bias across different demographics (race, gender, age). The ViT model used was chosen for its relative robustness, but biases inherent in the FER-2013 dataset may still persist.
+    \item \textbf{Emotional Manipulation}: There is a risk that emotion-aware systems could be used to manipulate user mood (e.g., keeping a user sad to sell comfort products). MoodMix AI is strictly a user-centric tool designed for well-being, with no commercial ad-targeting mechanisms.
+\end{itemize}
 
 \section{Conclusion and Future Work}
 MoodMix AI successfully demonstrates a robust, real-time framework for emotion-aware music recommendation. By fusing Vision Transformers and DistilBERT, we achieve a holistic understanding of user sentiment that surpasses unimodal systems. The application is optimized for deployment and offers a seamless user experience.
