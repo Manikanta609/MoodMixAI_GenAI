@@ -34,6 +34,7 @@ sys.excepthook = global_exception_handler
 # Auto-download models if missing (for Streamlit Cloud)
 from huggingface_hub import snapshot_download
 
+@st.cache_resource
 def check_and_download_models():
     models_dir = os.path.join(PROJECT_ROOT, "models")
     cv_model_path = os.path.join(models_dir, "cv_model_flat")
@@ -42,11 +43,19 @@ def check_and_download_models():
     try:
         if not os.path.exists(cv_model_path) or not os.listdir(cv_model_path):
             with st.spinner("Downloading CV Model (this may take a minute)..."):
-                snapshot_download(repo_id="dima806/facial_emotions_image_detection", local_dir=cv_model_path)
+                snapshot_download(
+                    repo_id="dima806/facial_emotions_image_detection", 
+                    local_dir=cv_model_path,
+                    ignore_patterns=["*.h5", "*.msgpack", "*.ot", "*.tflite"]
+                )
                 
         if not os.path.exists(nlp_model_path) or not os.listdir(nlp_model_path):
             with st.spinner("Downloading NLP Model (this may take a minute)..."):
-                snapshot_download(repo_id="bhadresh-savani/distilbert-base-uncased-emotion", local_dir=nlp_model_path)
+                snapshot_download(
+                    repo_id="bhadresh-savani/distilbert-base-uncased-emotion", 
+                    local_dir=nlp_model_path,
+                    allow_patterns=["config.json", "pytorch_model.bin", "tokenizer.json", "vocab.txt", "special_tokens_map.json", "tokenizer_config.json"]
+                )
     except Exception as e:
         st.error(f"Failed to download models: {e}")
         # Don't stop, let it try to load and fail gracefully later if needed
